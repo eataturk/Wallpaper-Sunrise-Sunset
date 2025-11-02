@@ -34,7 +34,7 @@ def _homebrew_share_candidates() -> list[Path]:
 
 def _repo_root_from_this_file() -> Path:
     # When running from source, this points to the repository root:
-    # src/sunpaper/cli.py -> repo/
+    # src/sunproject/cli.py -> repo/
     return Path(__file__).resolve().parents[2]
 
 
@@ -42,7 +42,7 @@ def _find_dir(name: str) -> Path | None:
     """
     Find 'scripts' or 'assets' directory.
     Search order:
-      1) Environment variable: SUNPAPER_SCRIPTS_DIR / SUNPAPER_ASSETS_DIR
+      1) Environment variable: SUNPROJECT_SCRIPTS_DIR / SUNPROJECT_ASSETS_DIR
       2) Repository checkout (../.. from this file) -> ./<name>
       3) Homebrew share locations (pkgshare)
     """
@@ -128,7 +128,7 @@ def _run_or_die(cmd: list[str]) -> str:
 # ---------- Command handlers ----------
 
 def cmd_help(_: argparse.Namespace) -> int:
-    print("For usage, run:  sunpaper -h   or   sunpaper <command> -h")
+    print("For usage, run:  sunproject -h   or   sunproject <command> -h")
     return 0
 
 

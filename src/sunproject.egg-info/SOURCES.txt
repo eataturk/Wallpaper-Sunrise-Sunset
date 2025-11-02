@@ -1,0 +1,8 @@
+LICENSE
+README.md
+pyproject.toml
+src/sunproject.egg-info/PKG-INFO
+src/sunproject.egg-info/SOURCES.txt
+src/sunproject.egg-info/dependency_links.txt
+src/sunproject.egg-info/entry_points.txt
+src/sunproject.egg-info/top_level.txt
