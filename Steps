@@ -1,0 +1,10 @@
+Add everything inside a folder named "Wallpaper-Sunrise-Sunset".
+Create a folder named 'scripts/' with 'wallpaper.sunset.sh', 'wallpaper.sunrise.sh' and 'wallpaper.times.sh'.
+Create a folder named 'plists/' with 'com.wallpaper.sunset.plist', 'com.wallpaper.sunrise.plist' and 'com.wallpaper.times.plist'.
+Switch current files' directorys to be more general so it works anywhere.
+
+When Installed:
+  Ask where to download the folder.
+  Ask for the sunrise wallpaper
+  Ask for the sunset wallpaper.
+  Ask for latitude and longitude.
