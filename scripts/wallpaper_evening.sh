@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
-VERSION= "0.2.7"
-IMAGE="/opt/homebrew/Cellar/riset/$VERSION/share/riset/assets/evening.jpg"
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-"$0"}")" && pwd)"
+ASSETS_DIR="$(cd "$SCRIPT_DIR/../assets" && pwd)"
+IMAGE="${RISET_NIGHT_IMAGE:-$ASSETS_DIR/evening.jpg}"
+
 osascript <<EOF
 tell application "System Events"
     set picture of every desktop to POSIX file "$IMAGE"
