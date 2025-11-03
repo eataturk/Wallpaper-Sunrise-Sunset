@@ -1,14 +1,14 @@
 [project]
-name = "sunproject"
+name = "riset"
 version = "0.1.0"
 description = "Change macOS wallpapers at sunrise/sunset (CLI)"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
-authors = [{ name = "Gepasp, akeremkaya" }]
+authors = [{ name = "eataturk, akeremkaya" }]
 
 [project.scripts]
-sunproject = "sunproject.cli:main"
+riset = "riset.cli:main"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
