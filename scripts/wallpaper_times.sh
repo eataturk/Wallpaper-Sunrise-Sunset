@@ -1,32 +1,79 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-# Paths to your wallpaper scripts
-MORNING_SCRIPT="/Users/emirata/bin/wallpaper_morning.sh"
-EVENING_SCRIPT="/Users/emirata/bin/wallpaper_evening.sh"
+# Resolve location of companion scripts relative to this file unless overridden
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-"$0"}")" && pwd)"
+MORNING_SCRIPT="${MORNING_SCRIPT:-"$SCRIPT_DIR/wallpaper_morning.sh"}"
+EVENING_SCRIPT="${EVENING_SCRIPT:-"$SCRIPT_DIR/wallpaper_evening.sh"}"
+
+# Allow overriding python interpreter and location metadata via env vars
+PYTHON_BIN="${SUNPROJECT_PYTHON_BIN:-python3}"
+LAT="${SUNPROJECT_LAT:-41.0082}"
+LON="${SUNPROJECT_LON:--16.0216}"
+TZ_LABEL="${SUNPROJECT_TZ:-UTC+3}"
+CITY_NAME="${SUNPROJECT_CITY:-MyCity}"
+REGION_NAME="${SUNPROJECT_REGION:-MyRegion}"
+
+export SUNPROJECT_LAT="$LAT" \
+       SUNPROJECT_LON="$LON" \
+       SUNPROJECT_TZ="$TZ_LABEL" \
+       SUNPROJECT_CITY="$CITY_NAME" \
+       SUNPROJECT_REGION="$REGION_NAME"
 
 # Directory for temporary plists
 PLIST_DIR="$HOME/Library/LaunchAgents"
 SUNRISE_PLIST="$PLIST_DIR/com.emirata.wallpaper.sunrise.plist"
 SUNSET_PLIST="$PLIST_DIR/com.emirata.wallpaper.sunset.plist"
 
+mkdir -p "$PLIST_DIR"
+
+# Sanity check companions exist before proceeding
+if [ ! -f "$MORNING_SCRIPT" ] || [ ! -f "$EVENING_SCRIPT" ]; then
+  echo "Expected wallpaper scripts next to wallpaper_times.sh." >&2
+  exit 1
+fi
+
+if [ ! -x "$PYTHON_BIN" ]; then
+  if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+    echo "Python interpreter not found: $PYTHON_BIN" >&2
+    exit 1
+  fi
+fi
+
 # Calculate today's sunrise and sunset using Python/Astral
-SUNRISE_TIME=$(~/python_venv/bin/python3 - <<END
+SUNRISE_TIME=$("$PYTHON_BIN" - <<'END'
+import os
 from astral import LocationInfo
 from astral.sun import sun
 from datetime import datetime
-city = LocationInfo("MyCity","MyRegion","UTC+3", 41.0082, -16.0216)  # replace with your lat/lon
-s = sun(city.observer, date=datetime.now())
-print(s['sunrise'].strftime("%H:%M"))
+
+lat = float(os.environ["SUNPROJECT_LAT"])
+lon = float(os.environ["SUNPROJECT_LON"])
+tz = os.environ["SUNPROJECT_TZ"]
+city = os.environ["SUNPROJECT_CITY"]
+region = os.environ["SUNPROJECT_REGION"]
+
+location = LocationInfo(city, region, tz, lat, lon)
+sun_times = sun(location.observer, date=datetime.now())
+print(sun_times["sunrise"].strftime("%H:%M"))
 END
 )
 
-SUNSET_TIME=$(~/python_venv/bin/python3 - <<END
+SUNSET_TIME=$("$PYTHON_BIN" - <<'END'
+import os
 from astral import LocationInfo
 from astral.sun import sun
 from datetime import datetime
-city = LocationInfo("MyCity","MyRegion","UTC+3", 41.0082, -16.0216)
-s = sun(city.observer, date=datetime.now())
-print(s['sunset'].strftime("%H:%M"))
+
+lat = float(os.environ["SUNPROJECT_LAT"])
+lon = float(os.environ["SUNPROJECT_LON"])
+tz = os.environ["SUNPROJECT_TZ"]
+city = os.environ["SUNPROJECT_CITY"]
+region = os.environ["SUNPROJECT_REGION"]
+
+location = LocationInfo(city, region, tz, lat, lon)
+sun_times = sun(location.observer, date=datetime.now())
+print(sun_times["sunset"].strftime("%H:%M"))
 END
 )
 

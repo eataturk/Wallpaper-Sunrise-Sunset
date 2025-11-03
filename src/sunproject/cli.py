@@ -183,6 +183,38 @@ def cmd_background_change(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_post_install(_: argparse.Namespace) -> int:
+    """
+    Homebrew can invoke this after installation to bootstrap launch agents.
+    """
+    sdir = _scripts_dir()
+    times_script = sdir / "wallpaper_times.sh"
+    if not times_script.exists():
+        print(f"Expected script not found: {times_script}", file=sys.stderr)
+        return 2
+
+    env = os.environ.copy()
+    cfg = _read_config()
+    if "lat" in cfg:
+        env.setdefault("SUNPROJECT_LAT", cfg["lat"])
+    if "lon" in cfg:
+        env.setdefault("SUNPROJECT_LON", cfg["lon"])
+
+    res = subprocess.run(["bash", str(times_script)], text=True, capture_output=True, env=env)
+    if res.returncode != 0:
+        err = res.stderr.strip() or res.stdout.strip() or "wallpaper_times.sh failed"
+        print(err, file=sys.stderr)
+        return res.returncode
+
+    if res.stdout.strip():
+        print(res.stdout.strip())
+    if res.stderr.strip():
+        print(res.stderr.strip(), file=sys.stderr)
+
+    print("✅ wallpaper_times.sh executed (launch agents updated).")
+    return 0
+
+
 # ---------- Parser & entrypoint ----------
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -210,6 +242,12 @@ def _build_parser() -> argparse.ArgumentParser:
     bg_p = sub.add_parser("background_change", help="Change wallpaper")
     bg_p.add_argument("--mode", choices=["day", "night", "auto"], required=True, help="day | night | auto")
     bg_p.set_defaults(func=cmd_background_change)
+
+    post_p = sub.add_parser(
+        "post_install",
+        help="Run wallpaper_times.sh (for Homebrew post_install hook)."
+    )
+    post_p.set_defaults(func=cmd_post_install)
 
     return p
 
