@@ -22,8 +22,8 @@ export SUNPROJECT_LAT="$LAT" \
 
 # Directory for temporary plists
 PLIST_DIR="$HOME/Library/LaunchAgents"
-SUNRISE_PLIST="$PLIST_DIR/com.emirata.wallpaper.sunrise.plist"
-SUNSET_PLIST="$PLIST_DIR/com.emirata.wallpaper.sunset.plist"
+SUNRISE_PLIST="$PLIST_DIR/com.riset.sunrise.plist"
+SUNSET_PLIST="$PLIST_DIR/com.riset.sunset.plist"
 
 mkdir -p "$PLIST_DIR"
 
