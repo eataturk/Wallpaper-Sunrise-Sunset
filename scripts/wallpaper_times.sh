@@ -120,12 +120,27 @@ EOF
 create_plist "$SUNRISE_PLIST" "$MORNING_SCRIPT" "$SUNRISE_HOUR" "$SUNRISE_MIN"
 create_plist "$SUNSET_PLIST" "$EVENING_SCRIPT" "$SUNSET_HOUR" "$SUNSET_MIN"
 
-# Run wallpaper immediately if already past the scheduled time
+# Create sunrise and sunset plists
+create_plist "$SUNRISE_PLIST" "$MORNING_SCRIPT" "$SUNRISE_HOUR" "$SUNRISE_MIN"
+create_plist "$SUNSET_PLIST" "$EVENING_SCRIPT" "$SUNSET_HOUR" "$SUNSET_MIN"
+
+# Check which period of time the current time is
 if [ "$CURRENT_HOUR" -gt "$SUNRISE_HOUR" ] || { [ "$CURRENT_HOUR" -eq "$SUNRISE_HOUR" ] && [ "$CURRENT_MIN" -ge "$SUNRISE_MIN" ]; }; then
-    bash "$MORNING_SCRIPT"
+    AFTER_SUNRISE=true
+else
+    AFTER_SUNRISE=false
 fi
 
 if [ "$CURRENT_HOUR" -gt "$SUNSET_HOUR" ] || { [ "$CURRENT_HOUR" -eq "$SUNSET_HOUR" ] && [ "$CURRENT_MIN" -ge "$SUNSET_MIN" ]; }; then
+    AFTER_SUNSET=true
+else
+    AFTER_SUNSET=false
+fi
+
+# Run wallpaper immediately if already past the scheduled time
+if [ "$AFTER_SUNRISE" = true ] && [ "$AFTER_SUNSET" = false ]; then
+    bash "$MORNING_SCRIPT"
+else
     bash "$EVENING_SCRIPT"
 fi
 
