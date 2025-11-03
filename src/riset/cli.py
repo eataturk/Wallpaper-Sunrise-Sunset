@@ -192,6 +192,28 @@ def cmd_background_change(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_morning(_: argparse.Namespace) -> int:
+    sdir = _scripts_dir()
+    script = sdir / "wallpaper_morning.sh"
+    if not script.exists():
+        print(f"Expected script not found: {script}", file=sys.stderr)
+        return 2
+    _run_or_die([str(script)])
+    print("🌅 Morning wallpaper applied.")
+    return 0
+
+
+def cmd_evening(_: argparse.Namespace) -> int:
+    sdir = _scripts_dir()
+    script = sdir / "wallpaper_evening.sh"
+    if not script.exists():
+        print(f"Expected script not found: {script}", file=sys.stderr)
+        return 2
+    _run_or_die([str(script)])
+    print("🌇 Evening wallpaper applied.")
+    return 0
+
+
 def cmd_post_install(_: argparse.Namespace) -> int:
     """
     Homebrew can invoke this after installation to bootstrap launch agents.
@@ -297,6 +319,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Unload launch agents and delete generated plist files."
     )
     cleanup_p.set_defaults(func=cmd_cleanup)
+
+    morning_p = sub.add_parser("morning", help="Apply the morning wallpaper immediately.")
+    morning_p.set_defaults(func=cmd_morning)
+
+    evening_p = sub.add_parser("evening", help="Apply the evening wallpaper immediately.")
+    evening_p.set_defaults(func=cmd_evening)
 
     return p
 
