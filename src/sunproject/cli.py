@@ -83,6 +83,14 @@ def _assets_dir() -> Path | None:
     return _find_dir("assets")
 
 
+def _launch_agent_paths() -> list[Path]:
+    base = Path.home() / "Library" / "LaunchAgents"
+    return [
+        base / "com.emirata.wallpaper.sunrise.plist",
+        base / "com.emirata.wallpaper.sunset.plist",
+    ]
+
+
 # ---------- Simple config (key=value lines) ----------
 
 def _ensure_config_dir() -> None:
@@ -215,6 +223,39 @@ def cmd_post_install(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_cleanup(_: argparse.Namespace) -> int:
+    """
+    Unload launch agents and remove installed plist files.
+    """
+    plists = _launch_agent_paths()
+    uid = os.getuid()
+    errors: list[str] = []
+
+    for plist in plists:
+        res = _run(["launchctl", "bootout", f"gui/{uid}", str(plist)])
+        if res.returncode not in (0, 36):  # 36 = "Operation now in progress" - harmless
+            stderr = (res.stderr or "").strip()
+            stdout = (res.stdout or "").strip()
+            msg = stderr or stdout
+            if msg and "No such process" not in msg and "No such file or directory" not in msg:
+                errors.append(f"launchctl bootout {plist.name}: {msg}")
+
+        try:
+            plist.unlink()
+        except FileNotFoundError:
+            continue
+        except OSError as exc:
+            errors.append(f"Remove {plist.name}: {exc}")
+
+    if errors:
+        for err in errors:
+            print(err, file=sys.stderr)
+        return 1
+
+    print("🧹 Launch agents removed.")
+    return 0
+
+
 # ---------- Parser & entrypoint ----------
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -248,6 +289,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Run wallpaper_times.sh (for Homebrew post_install hook)."
     )
     post_p.set_defaults(func=cmd_post_install)
+
+    cleanup_p = sub.add_parser(
+        "cleanup",
+        help="Unload launch agents and delete generated plist files."
+    )
+    cleanup_p.set_defaults(func=cmd_cleanup)
 
     return p
 
