@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-IMAGE="/Users/emirata/Documents/everything_else/wallpaper/Backgrounds/Crosscode_Background_2.jpg"
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-"$0"}")" && pwd)"
+ASSETS_DIR="$(cd "$SCRIPT_DIR/../assets" && pwd)"
+IMAGE="${RISET_DAY_IMAGE:-$ASSETS_DIR/morning.jpg}"
+
 osascript <<EOF
 tell application "System Events"
     set picture of every desktop to POSIX file "$IMAGE"
