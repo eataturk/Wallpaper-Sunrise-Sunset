@@ -136,7 +136,8 @@ def _run_or_die(cmd: list[str]) -> str:
 # ---------- Command handlers ----------
 
 def cmd_help(_: argparse.Namespace) -> int:
-    print("For usage, run:  riset -h   or   riset <command> -h")
+    parser = _build_parser()
+    parser.print_help()
     return 0
 
 
