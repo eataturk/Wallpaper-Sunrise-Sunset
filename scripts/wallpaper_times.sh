@@ -130,8 +130,8 @@ if [ "$CURRENT_HOUR" -gt "$SUNSET_HOUR" ] || { [ "$CURRENT_HOUR" -eq "$SUNSET_HO
 fi
 
 # Load them into launchd
-launchctl bootout gui/$(id -u) "$SUNRISE_PLIST" 2>/dev/null
+launchctl bootout gui/$(id -u) "$SUNRISE_PLIST" 2>/dev/null || true
 launchctl bootstrap gui/$(id -u) "$SUNRISE_PLIST"
 
-launchctl bootout gui/$(id -u) "$SUNSET_PLIST" 2>/dev/null
+launchctl bootout gui/$(id -u) "$SUNSET_PLIST" 2>/dev/null || true
 launchctl bootstrap gui/$(id -u) "$SUNSET_PLIST"
