@@ -7,18 +7,18 @@ MORNING_SCRIPT="${MORNING_SCRIPT:-"$SCRIPT_DIR/wallpaper_morning.sh"}"
 EVENING_SCRIPT="${EVENING_SCRIPT:-"$SCRIPT_DIR/wallpaper_evening.sh"}"
 
 # Allow overriding python interpreter and location metadata via env vars
-PYTHON_BIN="${SUNPROJECT_PYTHON_BIN:-python3}"
-LAT="${SUNPROJECT_LAT:-41.0082}"
-LON="${SUNPROJECT_LON:--16.0216}"
-TZ_LABEL="${SUNPROJECT_TZ:-UTC+3}"
-CITY_NAME="${SUNPROJECT_CITY:-MyCity}"
-REGION_NAME="${SUNPROJECT_REGION:-MyRegion}"
+PYTHON_BIN="${RISET_PYTHON_BIN:-python3}"
+LAT="${RISET_LAT:-41.0082}"
+LON="${RISET_LON:--16.0216}"
+TZ_LABEL="${RISET_TZ:-UTC+3}"
+CITY_NAME="${RISET_CITY:-MyCity}"
+REGION_NAME="${RISET_REGION:-MyRegion}"
 
-export SUNPROJECT_LAT="$LAT" \
-       SUNPROJECT_LON="$LON" \
-       SUNPROJECT_TZ="$TZ_LABEL" \
-       SUNPROJECT_CITY="$CITY_NAME" \
-       SUNPROJECT_REGION="$REGION_NAME"
+export RISET_LAT="$LAT" \
+       RISET_LON="$LON" \
+       RISET_TZ="$TZ_LABEL" \
+       RISET_CITY="$CITY_NAME" \
+       RISET_REGION="$REGION_NAME"
 
 # Directory for temporary plists
 PLIST_DIR="$HOME/Library/LaunchAgents"
@@ -47,11 +47,11 @@ from astral import LocationInfo
 from astral.sun import sun
 from datetime import datetime
 
-lat = float(os.environ["SUNPROJECT_LAT"])
-lon = float(os.environ["SUNPROJECT_LON"])
-tz = os.environ["SUNPROJECT_TZ"]
-city = os.environ["SUNPROJECT_CITY"]
-region = os.environ["SUNPROJECT_REGION"]
+lat = float(os.environ["RISET_LAT"])
+lon = float(os.environ["RISET_LON"])
+tz = os.environ["RISET_TZ"]
+city = os.environ["RISET_CITY"]
+region = os.environ["RISET_REGION"]
 
 location = LocationInfo(city, region, tz, lat, lon)
 sun_times = sun(location.observer, date=datetime.now())
@@ -65,11 +65,11 @@ from astral import LocationInfo
 from astral.sun import sun
 from datetime import datetime
 
-lat = float(os.environ["SUNPROJECT_LAT"])
-lon = float(os.environ["SUNPROJECT_LON"])
-tz = os.environ["SUNPROJECT_TZ"]
-city = os.environ["SUNPROJECT_CITY"]
-region = os.environ["SUNPROJECT_REGION"]
+lat = float(os.environ["RISET_LAT"])
+lon = float(os.environ["RISET_LON"])
+tz = os.environ["RISET_TZ"]
+city = os.environ["RISET_CITY"]
+region = os.environ["RISET_REGION"]
 
 location = LocationInfo(city, region, tz, lat, lon)
 sun_times = sun(location.observer, date=datetime.now())

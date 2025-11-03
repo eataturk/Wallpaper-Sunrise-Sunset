@@ -9,7 +9,7 @@ from pathlib import Path
 
 from . import __version__
 
-APP_NAME = "sunproject"
+APP_NAME = "riset"
 CONFIG_PATH = Path.home() / ".config" / APP_NAME / "config.toml"
 
 
@@ -34,7 +34,7 @@ def _homebrew_share_candidates() -> list[Path]:
 
 def _repo_root_from_this_file() -> Path:
     # When running from source, this points to the repository root:
-    # src/sunproject/cli.py -> repo/
+    # src/riset/cli.py -> repo/
     return Path(__file__).resolve().parents[2]
 
 
@@ -42,12 +42,12 @@ def _find_dir(name: str) -> Path | None:
     """
     Find 'scripts' or 'assets' directory.
     Search order:
-      1) Environment variable: SUNPROJECT_SCRIPTS_DIR / SUNPROJECT_ASSETS_DIR
+      1) Environment variable: RISET_SCRIPTS_DIR / RISET_ASSETS_DIR
       2) Repository checkout (../.. from this file) -> ./<name>
       3) Homebrew share locations (pkgshare)
     """
     # 1) ENV
-    env_key = f"SUNPROJECT_{name.upper()}_DIR"
+    env_key = f"RISET_{name.upper()}_DIR"
     env_val = os.environ.get(env_key)
     if env_val:
         p = Path(env_val).expanduser()
@@ -74,7 +74,7 @@ def _scripts_dir() -> Path:
     if p is None:
         raise FileNotFoundError(
             "Could not find 'scripts' directory. "
-            "Set ENV 'SUNPROJECT_SCRIPTS_DIR' or install scripts via Homebrew pkgshare."
+            "Set ENV 'RISET_SCRIPTS_DIR' or install scripts via Homebrew pkgshare."
         )
     return p
 
@@ -112,7 +112,7 @@ def _read_config() -> dict[str, str]:
 
 def _write_config(cfg: dict[str, str]) -> None:
     _ensure_config_dir()
-    lines = ["# sunproject config"]
+    lines = ["# riset config"]
     for k, v in cfg.items():
         lines.append(f"{k}={v}")
     CONFIG_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -136,7 +136,7 @@ def _run_or_die(cmd: list[str]) -> str:
 # ---------- Command handlers ----------
 
 def cmd_help(_: argparse.Namespace) -> int:
-    print("For usage, run:  sunproject -h   or   sunproject <command> -h")
+    print("For usage, run:  riset -h   or   riset <command> -h")
     return 0
 
 
@@ -204,9 +204,9 @@ def cmd_post_install(_: argparse.Namespace) -> int:
     env = os.environ.copy()
     cfg = _read_config()
     if "lat" in cfg:
-        env.setdefault("SUNPROJECT_LAT", cfg["lat"])
+        env.setdefault("RISET_LAT", cfg["lat"])
     if "lon" in cfg:
-        env.setdefault("SUNPROJECT_LON", cfg["lon"])
+        env.setdefault("RISET_LON", cfg["lon"])
 
     res = subprocess.run(["bash", str(times_script)], text=True, capture_output=True, env=env)
     if res.returncode != 0:
