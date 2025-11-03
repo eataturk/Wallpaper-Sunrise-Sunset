@@ -86,8 +86,8 @@ def _assets_dir() -> Path | None:
 def _launch_agent_paths() -> list[Path]:
     base = Path.home() / "Library" / "LaunchAgents"
     return [
-        base / "com.emirata.wallpaper.sunrise.plist",
-        base / "com.emirata.wallpaper.sunset.plist",
+        base / "com.riset.sunrise.plist",
+        base / "com.riset.sunset.plist",
     ]
 
 
