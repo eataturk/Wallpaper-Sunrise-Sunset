@@ -203,6 +203,7 @@ def cmd_post_install(_: argparse.Namespace) -> int:
         return 2
 
     env = os.environ.copy()
+    env.setdefault("RISET_PYTHON_BIN", sys.executable)
     cfg = _read_config()
     if "lat" in cfg:
         env.setdefault("RISET_LAT", cfg["lat"])
