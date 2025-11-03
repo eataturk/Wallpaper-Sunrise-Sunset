@@ -13,6 +13,7 @@
         <key>Hour</key><integer>17</integer>
         <key>Minute</key><integer>56</integer>
     </dict>
-    <key>RunAtLoad</key><false/>
+    <key>RunAtLoad</key>
+    <false/>
 </dict>
 </plist>
