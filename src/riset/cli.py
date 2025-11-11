@@ -6,14 +6,15 @@ import os
 import sys
 import shutil
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 from . import __version__
 
 APP_NAME = "riset"
 CONFIG_PATH = Path.home() / ".config" / APP_NAME / "config.toml"
-DAY_ASSET = "morning.jpg"
-NIGHT_ASSET = "evening.jpg"
+DAY_PREFIX = "morning"
+NIGHT_PREFIX = "evening"
 
 
 # ---------- Paths & discovery helpers ----------
@@ -176,7 +177,7 @@ def cmd_evening(_: argparse.Namespace) -> int:
     return 0
 
 
-def _replace_wallpaper_image(src: str, dest_filename: str, label: str) -> int:
+def _replace_wallpaper_image(src: str, prefix: str, label: str) -> int:
     assets_dir = _assets_dir()
     if assets_dir is None:
         print(
@@ -194,6 +195,17 @@ def _replace_wallpaper_image(src: str, dest_filename: str, label: str) -> int:
         print(f"Expected a file but got: {src_path}", file=sys.stderr)
         return 2
 
+    # Remove previously generated custom files for this prefix (e.g., morning_*)
+    pattern = f"{prefix}_*"
+    for old in assets_dir.glob(pattern):
+        try:
+            old.unlink()
+        except OSError as exc:
+            print(f"Warning: could not remove {old.name}: {exc}", file=sys.stderr)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    dest_ext = src_path.suffix.lower()
+    dest_filename = f"{prefix}_{timestamp}{dest_ext}"
     dest_path = assets_dir / dest_filename
     dest_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -208,11 +220,11 @@ def _replace_wallpaper_image(src: str, dest_filename: str, label: str) -> int:
 
 
 def cmd_day_image(args: argparse.Namespace) -> int:
-    return _replace_wallpaper_image(args.image, DAY_ASSET, "Day")
+    return _replace_wallpaper_image(args.image, DAY_PREFIX, "Day")
 
 
 def cmd_night_image(args: argparse.Namespace) -> int:
-    return _replace_wallpaper_image(args.image, NIGHT_ASSET, "Night")
+    return _replace_wallpaper_image(args.image, NIGHT_PREFIX, "Night")
 
 
 def cmd_post_install(_: argparse.Namespace) -> int:
