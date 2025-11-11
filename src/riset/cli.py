@@ -139,7 +139,7 @@ def _run_or_die(cmd: list[str]) -> str:
 # ---------- Command handlers ----------
 
 def cmd_help(args: argparse.Namespace) -> int:
-    parser = args._parser  # type: ignore[attr-defined]
+    parser = args._parser
     parser.print_help()
     return 0
 
