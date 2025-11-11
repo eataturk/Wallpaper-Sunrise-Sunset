@@ -195,9 +195,10 @@ def _replace_wallpaper_image(src: str, prefix: str, label: str) -> int:
         print(f"Expected a file but got: {src_path}", file=sys.stderr)
         return 2
 
-    # Remove previously generated custom files for this prefix (e.g., morning_*)
-    pattern = f"{prefix}_*"
-    for old in assets_dir.glob(pattern):
+    # Remove previously generated files that start with this prefix (e.g., morning*)
+    for old in assets_dir.glob(f"{prefix}*"):
+        if not old.is_file():
+            continue
         try:
             old.unlink()
         except OSError as exc:
