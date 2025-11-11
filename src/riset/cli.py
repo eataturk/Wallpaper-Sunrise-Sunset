@@ -8,7 +8,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from __init__ import __version__
+from . import __version__
 
 APP_NAME = "riset"
 CONFIG_PATH = Path.home() / ".config" / APP_NAME / "config.toml"
@@ -336,7 +336,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Print version and exit",
     )
 
-    sub = p.add_subparsers(dest="cmd", metavar="<command>", required=True)
+    sub = p.add_subparsers(dest="cmd", metavar="<command>")
 
     help_p = sub.add_parser("help", help="Show quick help")
     help_p.set_defaults(func=cmd_help)
