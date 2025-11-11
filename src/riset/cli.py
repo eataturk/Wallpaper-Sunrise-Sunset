@@ -4,13 +4,16 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import shutil
 import subprocess
 from pathlib import Path
 
-from . import __version__
+from __init__ import __version__
 
 APP_NAME = "riset"
 CONFIG_PATH = Path.home() / ".config" / APP_NAME / "config.toml"
+DAY_ASSET = "morning.jpg"
+NIGHT_ASSET = "evening.jpg"
 
 
 # ---------- Paths & discovery helpers ----------
@@ -214,6 +217,45 @@ def cmd_evening(_: argparse.Namespace) -> int:
     return 0
 
 
+def _replace_wallpaper_image(src: str, dest_filename: str, label: str) -> int:
+    assets_dir = _assets_dir()
+    if assets_dir is None:
+        print(
+            "Could not find assets directory. "
+            "Set RISET_ASSETS_DIR or ensure assets are installed.",
+            file=sys.stderr,
+        )
+        return 2
+
+    src_path = Path(src).expanduser()
+    if not src_path.exists():
+        print(f"Image not found: {src_path}", file=sys.stderr)
+        return 2
+    if not src_path.is_file():
+        print(f"Expected a file but got: {src_path}", file=sys.stderr)
+        return 2
+
+    dest_path = assets_dir / dest_filename
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        shutil.copy2(src_path, dest_path)
+    except OSError as exc:
+        print(f"Failed to copy image: {exc}", file=sys.stderr)
+        return 2
+
+    print(f"✅ {label} wallpaper updated -> {dest_path}")
+    return 0
+
+
+def cmd_day_image(args: argparse.Namespace) -> int:
+    return _replace_wallpaper_image(args.image, DAY_ASSET, "Day")
+
+
+def cmd_night_image(args: argparse.Namespace) -> int:
+    return _replace_wallpaper_image(args.image, NIGHT_ASSET, "Night")
+
+
 def cmd_post_install(_: argparse.Namespace) -> int:
     """
     Homebrew can invoke this after installation to bootstrap launch agents.
@@ -325,6 +367,20 @@ def _build_parser() -> argparse.ArgumentParser:
 
     evening_p = sub.add_parser("evening", help="Apply the evening wallpaper immediately.")
     evening_p.set_defaults(func=cmd_evening)
+
+    day_p = sub.add_parser(
+        "day",
+        help="Replace the stored day wallpaper image (copies to assets/morning.jpg)."
+    )
+    day_p.add_argument("image", help="Path to the image file to use for day mode.")
+    day_p.set_defaults(func=cmd_day_image)
+
+    night_p = sub.add_parser(
+        "night",
+        help="Replace the stored night wallpaper image (copies to assets/evening.jpg)."
+    )
+    night_p.add_argument("image", help="Path to the image file to use for night mode.")
+    night_p.set_defaults(func=cmd_night_image)
 
     return p
 
