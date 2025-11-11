@@ -154,47 +154,6 @@ def cmd_location_change(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_background_change(args: argparse.Namespace) -> int:
-    sdir = _scripts_dir()
-
-    if args.mode == "auto":
-        # Preferred: a single script that decides and applies (your existing scheduler/logic)
-        times_script = sdir / "wallpaper_times.sh"
-        if times_script.exists():
-            _run_or_die([str(times_script)])
-            print("🖼️  Wallpaper set automatically (day/night).")
-            return 0
-
-        # Fallback: compute_mode.sh prints 'day' or 'night'; we then call the specific script
-        compute_script = sdir / "compute_mode.sh"
-        if compute_script.exists():
-            mode = _run_or_die([str(compute_script)]).strip().lower()
-            if mode not in {"day", "night"}:
-                print(f"Invalid mode from compute_mode.sh: {mode}", file=sys.stderr)
-                return 2
-            args.mode = mode
-        else:
-            print("For --mode auto, expected 'wallpaper_times.sh' or 'compute_mode.sh' not found.", file=sys.stderr)
-            return 2
-
-    # Explicit day/night: call dedicated scripts
-    if args.mode == "day":
-        script = sdir / "wallpaper_morning.sh"
-    elif args.mode == "night":
-        script = sdir / "wallpaper_evening.sh"
-    else:
-        print("Invalid --mode. Must be one of: day | night | auto", file=sys.stderr)
-        return 2
-
-    if not script.exists():
-        print(f"Expected script not found: {script}", file=sys.stderr)
-        return 2
-
-    _run_or_die([str(script)])
-    print(f"🖼️  Wallpaper set: {args.mode}")
-    return 0
-
-
 def cmd_morning(_: argparse.Namespace) -> int:
     sdir = _scripts_dir()
     script = sdir / "wallpaper_morning.sh"
@@ -347,10 +306,6 @@ def _build_parser() -> argparse.ArgumentParser:
     loc_p.add_argument("--lat", type=float, required=True, help="Latitude (e.g., 41.0082)")
     loc_p.add_argument("--lon", type=float, required=True, help="Longitude (e.g., 28.9784)")
     loc_p.set_defaults(func=cmd_location_change)
-
-    bg_p = sub.add_parser("background_change", help="Change wallpaper")
-    bg_p.add_argument("--mode", choices=["day", "night", "auto"], required=True, help="day | night | auto")
-    bg_p.set_defaults(func=cmd_background_change)
 
     post_p = sub.add_parser(
         "post_install",
