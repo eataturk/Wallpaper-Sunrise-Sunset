@@ -387,8 +387,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
-    args = parser.parse_args(argv)
     try:
+        args = parser.parse_args(argv)
         return int(args.func(args))
     except SystemExit as e:
         return int(e.code)
