@@ -138,8 +138,8 @@ def _run_or_die(cmd: list[str]) -> str:
 
 # ---------- Command handlers ----------
 
-def cmd_help(_: argparse.Namespace) -> int:
-    parser = _build_parser()
+def cmd_help(args: argparse.Namespace) -> int:
+    parser = args._parser  # type: ignore[attr-defined]
     parser.print_help()
     return 0
 
@@ -329,6 +329,8 @@ def _build_parser() -> argparse.ArgumentParser:
         prog=APP_NAME,
         description="CLI wrapper for a sunrise/sunset-based wallpaper workflow."
     )
+    # Default to showing help when no subcommand is supplied (mimics `brew` UX).
+    p.set_defaults(func=cmd_help, _parser=p)
     p.add_argument(
         "--version",
         action="version",
@@ -339,7 +341,7 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="cmd", metavar="<command>")
 
     help_p = sub.add_parser("help", help="Show quick help")
-    help_p.set_defaults(func=cmd_help)
+    help_p.set_defaults(func=cmd_help, _parser=p)
 
     loc_p = sub.add_parser("location_change", help="Update location (lat/lon)")
     loc_p.add_argument("--lat", type=float, required=True, help="Latitude (e.g., 41.0082)")
