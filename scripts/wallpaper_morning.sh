@@ -3,7 +3,11 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-"$0"}")" && pwd)"
 ASSETS_DIR="$(cd "$SCRIPT_DIR/../assets" && pwd)"
-IMAGE="${RISET_DAY_IMAGE:-$ASSETS_DIR/morning.jpg}"
+IMAGE="$(ls -t "$ASSETS_DIR"/morning* 2>/dev/null | head -n1)"
+if [[ -z "$IMAGE" ]]; then
+    echo "No file found in $ASSETS_DIR starting with 'morning'." >&2
+    exit 1
+fi
 
 osascript <<EOF
 tell application "System Events"
